@@ -563,6 +563,8 @@ a { color: var(--orange-deep); }
   background: linear-gradient(160deg, var(--stage-a) 0%, var(--stage-b) 46%, var(--stage-c) 100%);
 }
 .pills {
+  position: relative;
+  z-index: 62;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -584,8 +586,10 @@ a { color: var(--orange-deep); }
 }
 [data-theme="dark"] .pill { background: rgba(255, 255, 255, 0.045); }
 .pill:hover { background: var(--hover); }
-.pill.active { background: rgba(243, 91, 40, 0.10); border-color: rgba(243, 91, 40, 0.62); }
-[data-theme="dark"] .pill.active { background: rgba(243, 91, 40, 0.18); }
+.pill.active,
+.pill.pending { background: rgba(243, 91, 40, 0.10); border-color: rgba(243, 91, 40, 0.62); }
+[data-theme="dark"] .pill.active,
+[data-theme="dark"] .pill.pending { background: rgba(243, 91, 40, 0.18); }
 .pill kbd {
   padding: 3px 9px;
   border-radius: 7px;
@@ -597,7 +601,8 @@ a { color: var(--orange-deep); }
   box-shadow: var(--key-shadow);
 }
 [data-theme="dark"] .pill kbd { color: #e8eae6; }
-.pill.active kbd {
+.pill.active kbd,
+.pill.pending kbd {
   background: linear-gradient(180deg, var(--orange-soft), var(--orange));
   color: #fff;
   box-shadow: 0 2px 0 var(--orange-deep);
@@ -1117,8 +1122,10 @@ a { color: var(--orange-deep); }
   white-space: nowrap;
 }
 .shortcut:hover { background: var(--hover); }
-.shortcut.active { background: rgba(243, 91, 40, 0.10); color: var(--ink); }
-[data-theme="dark"] .shortcut.active { background: rgba(243, 91, 40, 0.18); }
+.shortcut.active,
+.shortcut.pending { background: rgba(243, 91, 40, 0.10); color: var(--ink); }
+[data-theme="dark"] .shortcut.active,
+[data-theme="dark"] .shortcut.pending { background: rgba(243, 91, 40, 0.18); }
 .shortcut kbd {
   padding: 1px 5px;
   border-radius: 5px;
@@ -1128,7 +1135,8 @@ a { color: var(--orange-deep); }
   font-size: 10.5px;
   font-weight: 700;
 }
-.shortcut.active kbd { background: linear-gradient(180deg, var(--orange-soft), var(--orange)); color: #fff; }
+.shortcut.active kbd,
+.shortcut.pending kbd { background: linear-gradient(180deg, var(--orange-soft), var(--orange)); color: #fff; }
 
 /* ================================================================= wheel */
 .wheel-layer {

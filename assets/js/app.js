@@ -72,6 +72,7 @@ let wheel;
 let els = {};
 let dragDepth = 0;
 let modifierTimer = null;
+let modifierPending = null;
 let renderQueued = false;
 
 /* ------------------------------------------------------------------ boot */
@@ -697,8 +698,14 @@ function renderStatus() {
 
 function updateModeUI() {
   const mode = currentMode();
-  $$(".pill").forEach((p) => p.classList.toggle("active", p.dataset.wheel === mode));
-  $$(".statusbar .shortcut[data-wheel]").forEach((b) => b.classList.toggle("active", b.dataset.wheel === mode));
+  $$(".pill").forEach((p) => {
+    p.classList.toggle("active", p.dataset.wheel === mode);
+    p.classList.toggle("pending", p.dataset.wheel === modifierPending && p.dataset.wheel !== mode);
+  });
+  $$(".statusbar .shortcut[data-wheel]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.wheel === mode);
+    b.classList.toggle("pending", b.dataset.wheel === modifierPending && b.dataset.wheel !== mode);
+  });
 }
 
 /* ------------------------------------------------------------- interactions */
@@ -754,6 +761,8 @@ function bindEvents() {
   document.addEventListener("click", onDocumentClick);
   document.addEventListener("dblclick", onDocumentDoubleClick);
   document.addEventListener("keydown", onKeyDown);
+  document.addEventListener("keyup", onKeyUp);
+  window.addEventListener("blur", clearModifierWait);
 
   // drag and drop
   window.addEventListener("dragenter", (e) => {
@@ -854,7 +863,9 @@ function syncWheelHint() {
 }
 
 function openWheel(mode) {
+  modifierPending = null;
   if (!selectedCard()) {
+    updateModeUI();
     toast("Select a file first — the wheel acts on the file you are pointing at.", "error");
     return;
   }
@@ -929,27 +940,54 @@ function onDocumentDoubleClick(e) {
   }
 }
 
+function clearModifierWait() {
+  if (modifierTimer) {
+    clearTimeout(modifierTimer);
+    modifierTimer = null;
+  }
+  if (modifierPending) {
+    modifierPending = null;
+    updateModeUI();
+  }
+}
+
+function onKeyUp(e) {
+  if (!["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
+  // Only clear once every modifier is up; releasing one while another is still
+  // held must not cancel the pending wheel of the held key.
+  if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) clearModifierWait();
+}
+
 function onKeyDown(e) {
   const typing = isTyping(e.target);
   const mod = e.key === "Shift" || e.key === "Control" || e.key === "Alt";
   if (mod && !typing) {
     if (e.repeat) return;
     const mode = e.key === "Shift" ? "formats" : e.key === "Control" ? "tools" : "actions";
+    clearTimeout(modifierTimer);
+    modifierTimer = null;
     if (wheel.open) {
       e.preventDefault();
+      modifierPending = null;
       state.mode = mode;
       updateModeUI();
       renderStage();
       wheel.setMode(mode);
       return;
     }
-    clearTimeout(modifierTimer);
+    // Show the keycap state immediately, before the hold delay opens the ring.
+    modifierPending = mode;
+    updateModeUI();
     modifierTimer = setTimeout(() => {
-      if (!state.busy && selectedCard()) openWheel(mode);
+      modifierTimer = null;
+      const canOpen = !state.busy && selectedCard();
+      modifierPending = null;
+      if (canOpen) openWheel(mode);
+      else updateModeUI();
     }, 160);
     return;
   }
-  if (modifierTimer) { clearTimeout(modifierTimer); modifierTimer = null; }
+  if (modifierTimer || modifierPending) clearModifierWait();
 
   if (typing) return;
   if (e.key === "F1" || (e.key === "?" && !e.metaKey)) {
