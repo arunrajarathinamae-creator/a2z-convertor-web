@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>A2Z Convertor — the local file desk for the web</title>
+  <meta name="description" content="A2Z Convertor Web — convert images, video, audio, PDFs, documents, slides, spreadsheets, subtitles and archives. Everything happens in your browser; files never leave your device.">
+  <meta name="theme-color" content="#f35b28">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span id="brand-logo" class="brand-logo-slot"></span>
+        <div class="brand-text">
+          <h1>A2Z Convertor</h1>
+          <p>The zero-click file converter</p>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <span class="badge-local" title="No uploads, no account, no telemetry">
+          <span class="badge-ico" data-icon="lock"></span>
+          Local · Offline · No uploads
+        </span>
+        <label class="search">
+          <span class="search-ico" data-icon="search"></span>
+          <input id="search" type="search" autocomplete="off" spellcheck="false" placeholder="Search your files (Ctrl+K)" aria-label="Search your files">
+          <kbd>Ctrl K</kbd>
+        </label>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn mobile-only" id="btn-files-mobile" data-icon="list" title="Files" aria-label="Files"></button>
+        <button class="icon-btn mobile-only" id="btn-inspector-mobile" data-icon="info" title="Selected file" aria-label="Selected file"></button>
+        <button class="icon-btn" id="btn-help" data-icon="help" title="Help (F1)" aria-label="Help"></button>
+        <button class="icon-btn" id="btn-downloads" data-icon="download" title="Downloads from this session" aria-label="Downloads"></button>
+        <button class="icon-btn" id="btn-theme" title="Theme" aria-label="Theme"></button>
+      </div>
+    </header>
+
+    <div class="main">
+      <aside class="rail" id="rail">
+        <button class="add-files" id="btn-add">
+          <span data-icon="plus"></span> Add Files
+        </button>
+        <button class="add-folder" id="btn-add-folder">
+          <span class="nav-ico" data-icon="folder-open"></span> Add folder
+        </button>
+        <input id="file-input" type="file" multiple hidden>
+        <input id="folder-input" type="file" webkitdirectory directory multiple hidden>
+
+        <nav class="rail-nav" aria-label="Places">
+          <button class="nav" data-view="home"><span class="nav-ico" data-icon="home"></span>Home</button>
+          <button class="nav" data-view="recent"><span class="nav-ico" data-icon="clock"></span>Recent</button>
+          <button class="nav" data-view="favorites"><span class="nav-ico" data-icon="star"></span>Favorites</button>
+          <button class="nav" data-view="batch"><span class="nav-ico" data-icon="batch"></span>Batch Convert</button>
+        </nav>
+
+        <p class="rail-section">TOOLS</p>
+        <nav class="rail-nav" aria-label="Tool families">
+          <button class="nav" data-view="format"><span class="nav-ico" data-icon="arrows"></span>Format Convert</button>
+          <button class="nav" data-view="tools:image"><span class="nav-ico" data-icon="image"></span>Image Tools</button>
+          <button class="nav" data-view="tools:document"><span class="nav-ico" data-icon="document"></span>Document Tools</button>
+          <button class="nav" data-view="tools:video"><span class="nav-ico" data-icon="video"></span>Video Tools</button>
+          <button class="nav" data-view="tools:audio"><span class="nav-ico" data-icon="audio"></span>Audio Tools</button>
+          <button class="nav" data-view="tools:archive"><span class="nav-ico" data-icon="archive"></span>Archive Tools</button>
+          <button class="nav" data-view="tools:utilities"><span class="nav-ico" data-icon="tools"></span>Utilities</button>
+        </nav>
+
+        <div class="offline-card">
+          <b><span data-icon="shield"></span> 100% Offline</b>
+          <span>Files never leave this tab.</span>
+        </div>
+        <p class="rail-hint">Drop a folder to add the files inside it.</p>
+      </aside>
+
+      <section class="pane files-pane" id="files-pane" aria-label="Files on the desk">
+        <div class="pane-head files-head">
+          <h2 class="pane-title">Files</h2>
+          <span class="count-pill" id="file-count">0</span>
+          <span class="grow"></span>
+          <div class="seg" role="group" aria-label="File view">
+            <button class="seg-btn on" id="view-list" data-icon="list" title="List view" aria-label="List view"></button>
+            <button class="seg-btn" id="view-grid" data-icon="grid" title="Tile view" aria-label="Tile view"></button>
+          </div>
+          <button class="icon-btn" id="btn-clear" data-icon="trash" title="Clear the desk" aria-label="Clear the desk"></button>
+        </div>
+        <div class="file-list" id="file-list"></div>
+        <button class="mini-drop" id="mini-drop">
+          <b>Drop files here</b>
+          <span>or click Add Files</span>
+        </button>
+      </section>
+
+      <main class="pane stage" id="stage">
+        <div class="pills" role="tablist" aria-label="Wheel mode">
+          <button class="pill active" data-wheel="formats" role="tab"><kbd>Shift</kbd><span>Formats</span></button>
+          <button class="pill" data-wheel="tools" role="tab"><kbd>Ctrl</kbd><span>Tools</span></button>
+          <button class="pill" data-wheel="actions" role="tab"><kbd>Alt</kbd><span>Actions</span></button>
+        </div>
+        <div class="stage-body">
+          <div class="stage-heading">
+            <h2 id="stage-title">Drop a file to begin</h2>
+            <p id="stage-sub">Shift formats · Ctrl tools · Alt actions</p>
+          </div>
+          <div class="stage-wrap">
+            <button class="chev" id="page-prev" data-icon="chevronLeft" aria-label="Previous page"></button>
+            <div class="stage-grid" id="stage-grid"></div>
+            <button class="chev" id="page-next" data-icon="chevronRight" aria-label="Next page"></button>
+          </div>
+          <div class="dots" id="stage-dots"></div>
+        </div>
+        <div class="stage-empty" id="stage-empty"></div>
+        <div class="wheel-layer" id="wheel-layer" hidden></div>
+      </main>
+
+      <aside class="pane inspector" id="inspector" aria-label="Selected file"></aside>
+    </div>
+
+    <div class="quickbar" id="quickbar"></div>
+    <footer class="statusbar" id="statusbar"></footer>
+  </div>
+
+  <div class="drag-overlay" id="drag-overlay" hidden>
+    <div class="drag-card">
+      <div class="drag-badge" data-icon="download"></div>
+      <b>Drop to add</b>
+      <span>Files and folders are both fine. Nothing is uploaded.</span>
+    </div>
+  </div>
+
+  <div id="progress-slot" class="progress-slot"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <div id="modal-root"></div>
+
+  <noscript>
+    <div class="noscript">A2Z Convertor Web needs JavaScript to decode and re-encode files in your browser.</div>
+  </noscript>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
